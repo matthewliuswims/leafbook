@@ -1,0 +1,4 @@
+#!/bin/sh
+# Check exactly what is staged for personal info, secrets, and unapproved
+# binary files. Enable with git config core.hooksPath .githooks.
+exec node bin/leafbook.mjs check --staged
