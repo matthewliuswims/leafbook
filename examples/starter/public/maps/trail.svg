@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="200" viewBox="0 0 560 200">
+  <rect width="560" height="200" rx="16" fill="#f0f3e9"/>
+  <path d="M260 0c-25 46 48 64 23 105s-27 67-11 95" fill="none" stroke="#a2ccd2" stroke-width="13"/>
+  <path d="M75 147c96-124 208-5 408-82" fill="none" stroke="#527150" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 9"/>
+  <g fill="#365333">
+    <circle cx="75" cy="147" r="7"/><circle cx="280" cy="97" r="7"/><circle cx="483" cy="65" r="7"/>
+  </g>
+  <g font-family="Helvetica, Arial, sans-serif" font-size="15" fill="#273323">
+    <text x="58" y="174">Gate</text>
+    <text x="255" y="128">Creek</text>
+    <text x="456" y="43">Lookout</text>
+  </g>
+</svg>

@@ -1,0 +1,92 @@
+@import "tailwindcss" source(none);
+@plugin "@tailwindcss/typography";
+@source ".";
+@source "../components";
+
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Give heading anchors breathing room when scrolled to via sidebar outline. */
+.prose :is(h1, h2, h3, h4, h5, h6)[id] {
+  scroll-margin-top: 1.5rem;
+}
+
+body {
+  color: #1c1917;
+}
+
+/* Subtle polish on the prose area so pasted Google Doc content looks calm. */
+.prose :where(h1):not(:where([class~="not-prose"] *)) {
+  letter-spacing: -0.02em;
+}
+.prose :where(h2):not(:where([class~="not-prose"] *)) {
+  letter-spacing: -0.01em;
+  margin-top: 2.25em;
+}
+.prose :where(a):not(:where([class~="not-prose"] *)) {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+/* Keep wide planning tables usable without widening the whole page on phones. */
+.prose :where(table):not(:where([class~="not-prose"] *)) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Boxed tables: easier to scan than the default rules-only style. */
+.prose :where(table):not(:where([class~="not-prose"] *)) {
+  border-collapse: collapse;
+}
+.prose :where(th, td):not(:where([class~="not-prose"] *)) {
+  border: 1px solid #d6d3d1;
+  padding: 0.45em 0.75em;
+}
+.prose :where(thead th):not(:where([class~="not-prose"] *)) {
+  background: #f5f5f4;
+}
+
+/* Collapsible sections in tabs (<details> in markdown). */
+.prose :where(details):not(:where([class~="not-prose"] *)) {
+  border: 1px solid #e7e5e4;
+  border-radius: 0.5rem;
+  padding: 0.6em 1em;
+  margin: 0.75em 0;
+}
+.prose :where(summary):not(:where([class~="not-prose"] *)) {
+  cursor: pointer;
+}
+.prose :where(details[open] > summary):not(:where([class~="not-prose"] *)) {
+  margin-bottom: 0.5em;
+}
+.prose :where(summary small):not(:where([class~="not-prose"] *)) {
+  display: block;
+  margin-left: 1.1em;
+  margin-top: 0.15em;
+  color: #292524;
+  font-size: 1em;
+  font-weight: 400;
+}
+
+/* Stacked rules (--- --- ---) read as one heavy section divider. */
+.prose hr:has(+ hr) {
+  margin-bottom: 0;
+}
+.prose hr + hr {
+  margin-top: 5px;
+}

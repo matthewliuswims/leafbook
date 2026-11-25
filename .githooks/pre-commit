@@ -1,0 +1,4 @@
+#!/bin/sh
+# Block personal info, secrets, and unapproved binary files before they are
+# committed. Enable with git config core.hooksPath .githooks.
+exec node bin/leafbook.mjs check
