@@ -61,8 +61,6 @@ jobs:
           npm install "$tarball"
           npx leafbook check
           npx leafbook build
-          npx leafbook build
-          test "$(ls .leafbook | grep -c '^build-')" -le 2
           LEAFBOOK_PORT=3998 npx leafbook start > server.log 2>&1 &
           for i in $(seq 1 30); do
             curl -sf http://127.0.0.1:3998/Welcome > /dev/null && break

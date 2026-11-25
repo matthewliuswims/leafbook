@@ -150,9 +150,11 @@ test("reads frontmatter names without running code", () => {
   const root = fixture({
     "content/emails/inline.md": "---\nto: 'Ana Ruiz'\n---\n",
     "content/emails/list.md": "---\nto:\n  - Bo Chen\n  - Cy Diaz\n---\n",
+    "content/emails/flat.md": "---\nto:\n- Ed Park\n---\n",
+    "content/emails/folded.md": "---\nto: >\n  Flo Nakamura\n---\n",
     "content/emails/code.md":
       "---js\n{ to: (() => { throw new Error('ran code') })() }\n---\n",
-    "engine/app.ts": "Ruiz Chen Diaz\n",
+    "engine/app.ts": "Ruiz Chen Diaz Park Nakamura\n",
   });
   try {
     const result = runCheck({
@@ -162,7 +164,7 @@ test("reads frontmatter names without running code", () => {
         wordsFrom: [{ dir: "content/emails", frontmatter: "to" }],
       },
     });
-    assert.equal(result.findings.length, 3);
+    assert.equal(result.findings.length, 5);
   } finally {
     rmSync(root, { recursive: true });
   }
