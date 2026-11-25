@@ -1,10 +1,15 @@
 #!/bin/sh
-# Block direct pushes to main. Enable with git config core.hooksPath .githooks.
-while read -r _local_ref _local_sha remote_ref _remote_sha; do
+# Block direct pushes to main, and check every commit being pushed (its files
+# and message). Enable with git config core.hooksPath .githooks.
+zero=0000000000000000000000000000000000000000
+while read -r _local_ref local_sha remote_ref _remote_sha; do
   if [ "$remote_ref" = "refs/heads/main" ]; then
     echo "pre-push: direct push to main is blocked. Open a pull request." >&2
     exit 1
   fi
+  [ "$local_sha" = "$zero" ] && continue
+  for commit in $(git rev-list "$local_sha" --not --remotes); do
+    node bin/leafbook.mjs check --rev "$commit" || exit 1
+  done
 done
-node bin/leafbook.mjs check || exit 1
 exit 0

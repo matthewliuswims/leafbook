@@ -145,3 +145,42 @@ test("mask never shows a full match", () => {
   assert.equal(mask("Ramanathan"), "Ra********");
   assert.equal(mask("Lee"), "***");
 });
+
+test("reads frontmatter names without running code", () => {
+  const root = fixture({
+    "content/emails/inline.md": "---\nto: 'Ana Ruiz'\n---\n",
+    "content/emails/list.md": "---\nto:\n  - Bo Chen\n  - Cy Diaz\n---\n",
+    "content/emails/code.md":
+      "---js\n{ to: (() => { throw new Error('ran code') })() }\n---\n",
+    "engine/app.ts": "Ruiz Chen Diaz\n",
+  });
+  try {
+    const result = runCheck({
+      root,
+      target: path.join(root, "engine"),
+      checkConfig: {
+        wordsFrom: [{ dir: "content/emails", frontmatter: "to" }],
+      },
+    });
+    assert.equal(result.findings.length, 3);
+  } finally {
+    rmSync(root, { recursive: true });
+  }
+});
+
+test("scans file and folder names", () => {
+  const root = fixture({ "notes/acme-call.md": "nothing here\n" });
+  try {
+    const result = runCheck({
+      root,
+      target: root,
+      checkConfig: { words: ["acme"] },
+    });
+    assert.deepEqual(
+      result.findings.map((f) => [f.file, f.line, f.rule]),
+      [["notes/acme-call.md", 0, "private-word"]],
+    );
+  } finally {
+    rmSync(root, { recursive: true });
+  }
+});

@@ -17,8 +17,7 @@
     "scripts",
     "next.config.mjs",
     "postcss.config.mjs",
-    "tsconfig.json",
-    "examples/starter"
+    "tsconfig.json"
   ],
   "scripts": {
     "dev": "node bin/leafbook.mjs dev",

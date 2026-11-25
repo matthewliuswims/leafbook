@@ -9,7 +9,12 @@ function failure(error: string, status: number) {
 }
 
 export async function POST(request: Request) {
-  let payload: { slug?: unknown; body?: unknown; archive?: unknown } | null;
+  let payload: {
+    slug?: unknown;
+    body?: unknown;
+    base?: unknown;
+    archive?: unknown;
+  } | null;
   try {
     payload = await request.json();
   } catch {
@@ -19,14 +24,15 @@ export async function POST(request: Request) {
   if (
     typeof payload?.slug !== "string" ||
     typeof payload.body !== "string" ||
+    typeof payload.base !== "string" ||
     (payload.archive !== undefined && typeof payload.archive !== "boolean")
   ) {
     return failure(
-      "Expected { slug: string, body: string, archive?: boolean }",
+      "Expected { slug: string, body: string, base: string, archive?: boolean }",
       400,
     );
   }
-  const { slug, body, archive = false } = payload;
+  const { slug, body, base, archive = false } = payload;
   if (!isNoteSlug(slug)) return failure("Invalid slug", 400);
 
   try {
@@ -35,6 +41,14 @@ export async function POST(request: Request) {
     fs.accessSync(target, fs.constants.W_OK);
     const raw = fs.readFileSync(target, "utf8");
     const existing = parseNote(raw);
+    // Refuse to overwrite a note that changed since the editor loaded it,
+    // for example when an agent edited the file meanwhile.
+    if (existing.content.trim() !== base.trim()) {
+      return failure(
+        "This note changed on disk since you opened it. Copy your edits, reload, and apply them again.",
+        409,
+      );
+    }
     const frontmatter = raw.slice(0, raw.length - existing.content.length);
     const separator = frontmatter && !frontmatter.endsWith("\n") ? "\n" : "";
     const updated = `${frontmatter}${separator}${body}${body.endsWith("\n") ? "" : "\n"}`;

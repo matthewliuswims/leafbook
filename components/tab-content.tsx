@@ -90,7 +90,12 @@ export function TabContent({
       const res = await fetch("/api/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, body, archive: isArchive }),
+        body: JSON.stringify({
+          slug,
+          body,
+          base: savedBody,
+          archive: isArchive,
+        }),
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
       if (!data.ok) {
@@ -106,7 +111,7 @@ export function TabContent({
     } finally {
       setSaving(false);
     }
-  }, [slug, body, isArchive, router]);
+  }, [slug, body, savedBody, isArchive, router]);
 
   const handleCancel = useCallback(() => {
     setBody(savedBody);

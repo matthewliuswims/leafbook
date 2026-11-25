@@ -7,7 +7,7 @@ import {
 } from "../scripts/runtime.mjs";
 
 const usage =
-  "Usage: leafbook dev | build | start | preview | daemon install|refresh|stop | worktree [name] | check [folder]";
+  "Usage: leafbook dev | build | start | preview | daemon install|refresh|stop | worktree [name] | check [folder] [--staged | --rev <commit>]";
 const [command, ...args] = process.argv.slice(2);
 
 async function main() {
@@ -53,7 +53,7 @@ async function main() {
     const { daemon } = await import("../scripts/daemon.mjs");
     return daemon(args[0], config, port ?? config.daemonPort);
   }
-  if (command === "check" && args.length <= 1) {
+  if (command === "check") {
     const { check } = await import("../lib/check.mjs");
     return check(config, args);
   }

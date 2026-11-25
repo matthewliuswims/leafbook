@@ -79,9 +79,24 @@ export function build(config) {
       },
     );
     // Publish only a successful build. A running server keeps its snapshot.
+    const production = path.join(output, "production");
+    let previous = null;
+    try {
+      previous = fs.readlinkSync(production);
+    } catch {}
     const pointer = path.join(directory, ".publish");
     fs.symlinkSync(path.basename(directory), pointer);
-    fs.renameSync(pointer, path.join(output, "production"));
+    fs.renameSync(pointer, production);
+    // Keep the new build and the one a running server may still use.
+    for (const entry of fs.readdirSync(output)) {
+      if (
+        entry.startsWith("build-") &&
+        entry !== path.basename(directory) &&
+        entry !== previous
+      ) {
+        fs.rmSync(path.join(output, entry), { recursive: true, force: true });
+      }
+    }
   } catch (error) {
     fs.rmSync(directory, { recursive: true, force: true });
     throw error;

@@ -41,3 +41,35 @@ jobs:
             echo "$code /$route"
             test "$code" = 200
           done
+
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install the packed tarball into a fresh notes repo
+        run: |
+          tarball="$PWD/$(npm pack --silent)"
+          notes="$RUNNER_TEMP/notes"
+          cp -R examples/starter "$notes"
+          cd "$notes"
+          npm init -y > /dev/null
+          npm install "$tarball"
+          npx leafbook check
+          npx leafbook build
+          npx leafbook build
+          test "$(ls .leafbook | grep -c '^build-')" -le 2
+          LEAFBOOK_PORT=3998 npx leafbook start > server.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:3998/Welcome > /dev/null && break
+            sleep 1
+          done
+          for route in "" Welcome "Field%20Notes" maps/trail.svg; do
+            code=$(curl -sL -o /dev/null -w "%{http_code}" "http://127.0.0.1:3998/$route")
+            echo "$code /$route"
+            test "$code" = 200
+          done

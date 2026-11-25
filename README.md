@@ -4,6 +4,9 @@ Leafbook serves a folder of Markdown files as a tabbed notes site. Agents work
 directly in the files. In the browser you can search, jump to headings, and make
 small edits with a live preview. Each note has its own URL.
 
+Saving refuses to overwrite a note that changed on disk after you opened it,
+for example when an agent edited it meanwhile.
+
 **Local only.** Leafbook has no login and can write to your notes. It listens on
 `127.0.0.1`. Never deploy it publicly.
 
@@ -107,7 +110,7 @@ It fails on:
 - Binary files, such as screenshots and PDFs, unless approved.
 - Private words you list.
 
-In a Git checkout it scans what Git would commit. Results show only the first
+In a Git checkout it scans what Git would commit, and file names as well as contents. `--staged` scans exactly what is staged, and `--rev <commit>` scans a commit's files and message; the included hooks use these. In CI it prints only counts per rule. Results show only the first
 letters of each match, so CI logs stay safe to share. Placeholder emails at
 `example.com` and 555-01xx phone numbers pass.
 
@@ -128,7 +131,8 @@ your repo, not in Leafbook.
 
 - `words`: names, codenames, and terms that must never appear.
 - `wordsFrom`: pull names from a frontmatter field in every note in a folder,
-  so a new contact is covered as soon as their note exists. Each word of a
+  so a new contact is covered as soon as their note exists. The field is read
+  as plain text; frontmatter code is never run. Each word of a
   multi-word name is blocked too.
 - `allowWords`: common words that a pulled name made too strict.
 - `allowFiles` and `ignore`: exact paths, or folders ending in `/`.
