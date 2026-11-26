@@ -16,16 +16,17 @@ fi
 clean_main() {
   [ "$(git rev-parse --show-toplevel 2>/dev/null)" = "$LEAFBOOK_ROOT" ] &&
     [ "$(git branch --show-current)" = main ] &&
-    dirty="$(GIT_OPTIONAL_LOCKS=0 git status --porcelain)" &&
+    dirty="$(GIT_OPTIONAL_LOCKS=0 git status --porcelain --untracked-files=no)" &&
     [ -z "$dirty" ]
 }
 
-# Fetch and fast-forward before Next reads the notes.
+# Fetch and fast-forward before Next reads the notes. Untracked notes do not
+# block it, and Git refuses to overwrite them.
 if clean_main && git remote get-url origin >/dev/null 2>&1; then
   before="$(git rev-parse HEAD)"
   if git -c http.lowSpeedLimit=1000 -c http.lowSpeedTime=15 \
     fetch origin +refs/heads/main:refs/remotes/origin/main &&
-    clean_main && git merge --ff-only origin/main; then
+    clean_main && git merge --ff-only --no-overwrite-ignore origin/main; then
     if [ -f package.json ] && ! git diff --quiet "$before" HEAD -- package.json package-lock.json; then
       npm install --no-audit --no-fund || echo "Install failed. Trying the available dependencies." >&2
     fi

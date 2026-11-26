@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync, spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -184,5 +185,34 @@ test("scans file and folder names", () => {
     );
   } finally {
     rmSync(root, { recursive: true });
+  }
+});
+
+test("a hook's staged check of a subfolder scans only that folder", () => {
+  const root = fixture({
+    "leafbook.config.json": JSON.stringify({ check: { words: ["Zephyrine"] } }),
+    "sub/clean.md": "Nothing private.\n",
+    "private.md": "Zephyrine\n",
+  });
+  const cli = path.resolve(import.meta.dirname, "../bin/leafbook.mjs");
+  try {
+    execFileSync("git", ["init", "-q"], { cwd: root });
+    execFileSync("git", ["add", "."], { cwd: root });
+    // Git runs hooks from the top of the checkout with GIT_DIR set.
+    const env = {
+      ...process.env,
+      GIT_DIR: ".git",
+      GIT_INDEX_FILE: ".git/index",
+    };
+    const run = (folder) =>
+      spawnSync(process.execPath, [cli, "check", folder, "--staged"], {
+        cwd: root,
+        env,
+        encoding: "utf8",
+      }).status;
+    assert.equal(run("sub"), 0);
+    assert.equal(run("."), 1);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
   }
 });
